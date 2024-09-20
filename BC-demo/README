@@ -1,0 +1,102 @@
+# Contents
+
+QusideQrngCheck.java: QRNG check tool - tries a SecureRandom.getInstanceStrong() and checks it's what it should be. Then generates some seed data (which should come from the QRNG) via a BC SecureRandom.
+
+
+###########  Prerequisites
+
+The drivers and libraries for the PCIe card from Quside are operational
+
+
+
+Java build for JRE 11 (JRE 8 is also supported)
+
+##JAVA Install 
+sudo apt install openjdk-17-jdk -y
+
+##check what is default
+
+sudo update-alternatives --config java
+
+###there should only be one alternative
+
+#output 
+
+There is only one alternative in link group java (providing /usr/bin/java): /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+Nothing to configure.
+
+##if multiple select 17 as the default 
+
+## Check JAVA_HOME variable
+
+echo $JAVA_HOME
+
+if no output check where home is 
+
+java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home'
+
+--output 
+
+java.home = /usr/lib/jvm/java-17-openjdk-amd64
+
+
+
+
+set the environment 
+
+nano ~/.bashrc
+
+--at bottom of file add 
+#
+export JAVA_HOME='/usr/lib/jvm/java-17-openjdk-amd64'
+
+--save changes
+
+source ~/.bashrc
+
+
+
+
+########### Demo application contents  #########################
+
+README  this file
+
+
+QusideQrngCheck.java -- the java program to execute the demo 
+
+QusideQrngCheck.class  -- the compiled output of the above program
+
+build.sh: build script for the above.
+
+run.sh: run script for the above.
+
+java.security: Java Security file we use this as an override in run.sh
+
+
+
+lib -  QusideProvider.jar for JAVA SDK 17  this is the one referenced in the build and run scripts.  
+lib -  QusideProvider.jar.sdk21 is a provider compiled againmst SdK21 if that is preffered the scripts woudl need to be modified.
+lib -  bc-fips-2.0.0.jar   The bouncy castle FIPS 140-3 classes
+lib -  bcprov-jdk18on-1.79b01.jar.non fips  a non FIPS version of bouncy castle classess -- not referenced in the project
+
+
+
+#####Running the demo ##################
+navigate to the root directory of the demo
+
+##Executing the demo
+
+./build  --only required once 
+
+
+##then to run 
+
+./run
+
+
+# Notes:
+
+
+(C) 2024 Quside Technologies SL - All Rights Reserved
+
+
