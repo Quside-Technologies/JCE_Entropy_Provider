@@ -1,19 +1,18 @@
 #include <jni.h>
 #include "com_quside_QusideQRNG.h"
-#include "quside_QRNG_minimal.h"
+#include "quside_QRNG_admin.h" 
 #include <stdlib.h>
-
 // #define QRNG_DEBUG
 
 JNIEXPORT jint JNICALL Java_com_quside_QusideQRNG_findBoards(JNIEnv *env, jobject obj) {
-    return find_boards();
+    // Cast the return value to jint since find_boards() now returns uint16_t
+    return (jint)find_boards();
 }
 
 JNIEXPORT jint JNICALL Java_com_quside_QusideQRNG_getRandom(JNIEnv *env, jobject obj, jintArray mem_slot, jint Nuint32, jint devInd) {
     jint *c_mem_slot = (*env)->GetIntArrayElements(env, mem_slot, 0);
-
     int ret;
-
+    
     if(Nuint32 < 128){
         // Build an array of 128 uint32_t
         uint32_t *c_mem_slot_128 = (uint32_t *)malloc(128 * sizeof(uint32_t));
@@ -26,9 +25,9 @@ JNIEXPORT jint JNICALL Java_com_quside_QusideQRNG_getRandom(JNIEnv *env, jobject
         free(c_mem_slot_128);
     }
     else {
-        ret = get_random(c_mem_slot, (size_t)Nuint32 * 4, (uint16_t)devInd);
+        ret = get_random((uint32_t*)c_mem_slot, (size_t)Nuint32 * 4, (uint16_t)devInd);
     }
-
+    
     (*env)->ReleaseIntArrayElements(env, mem_slot, c_mem_slot, 0);
     return ret;
 }
@@ -49,7 +48,12 @@ JNIEXPORT jint JNICALL Java_com_quside_QusideQRNG_getHmin(JNIEnv *env, jobject o
 
 JNIEXPORT jint JNICALL Java_com_quside_QusideQRNG_getCalibrationStatus(JNIEnv *env, jobject obj, jint devInd, jintArray status) {
     jint *c_status = (*env)->GetIntArrayElements(env, status, 0);
-    int ret = get_calibration_status((uint16_t)devInd, (int *)c_status);
+    system_state_t state;
+    int ret = get_calibration_status((uint16_t)devInd, &state);
+    
+    // Convert the enum to int for Java
+    *c_status = (jint)state;
+    
     (*env)->ReleaseIntArrayElements(env, status, c_status, 0);
     return ret;
 }
@@ -57,4 +61,3 @@ JNIEXPORT jint JNICALL Java_com_quside_QusideQRNG_getCalibrationStatus(JNIEnv *e
 JNIEXPORT jint JNICALL Java_com_quside_QusideQRNG_setCalibration(JNIEnv *env, jobject obj, jint devInd) {
     return set_calibration((uint16_t)devInd);
 }
-

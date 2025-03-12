@@ -3,7 +3,7 @@ package com.quside;
 public class QusideQRNG {
     static {
         try {
-            System.loadLibrary("QusideQRNG");
+            System.loadLibrary("QusideQRNGjent");
         } catch (UnsatisfiedLinkError e) {
             System.err.println("Failed to load native library: " + e.getMessage());
             throw e;
